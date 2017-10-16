@@ -1,31 +1,21 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 
-export default class HelloWorld extends React.Component {
+import {updateName} from '../actions/helloWorldActionCreators';
+
+class HelloWorld extends React.Component {
   static propTypes = {
     name: PropTypes.string.isRequired, // this is passed from the Rails view
-  };
-
-  /**
-   * @param props - Comes from your rails view.
-   */
-  constructor(props) {
-    super(props);
-
-    // How to set initial state in ES6 class syntax
-    // https://facebook.github.io/react/docs/reusable-components.html#es6-classes
-    this.state = { name: this.props.name };
-  }
-
-  updateName = (name) => {
-    this.setState({ name });
+    updateName: PropTypes.func.isRequired,
   };
 
   render() {
     return (
       <div>
         <h3>
-          Hello, {this.state.name}!
+          Hello, {this.props.name}!
         </h3>
         <hr />
         <form >
@@ -35,11 +25,28 @@ export default class HelloWorld extends React.Component {
           <input
             id="name"
             type="text"
-            value={this.state.name}
-            onChange={(e) => this.updateName(e.target.value)}
+            value={this.props.name}
+            onChange={(e) => this.props.updateName(e.target.value)}
           />
         </form>
       </div>
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    name: state.name
+  };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    updateName: bindActionCreators(updateName, dispatch)
+  };
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(HelloWorld);
